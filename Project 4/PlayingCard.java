@@ -1,0 +1,321 @@
+package PJ4;
+
+import java.util.*;
+
+//=================================================================================
+/**
+ * class PlayingCardException: It is used for errors related to Card and Deck
+ * objects Do not modify this class!
+ */
+class PlayingCardException extends Exception {
+
+    /* Constructor to create a PlayingCardException object */
+    PlayingCardException() {
+        super();
+    }
+
+    PlayingCardException(String reason) {
+        super(reason);
+    }
+}
+
+//=================================================================================
+/**
+ * class Card : for creating playing card objects it is an immutable class. Rank
+ * - valid values are 1 to 13 Suit - valid values are 0 to 4 Do not modify this
+ * class!
+ */
+class Card {
+
+    /* constant suits and ranks */
+    static final String[] Suit = {"Joker", "Clubs", "Diamonds", "Hearts", "Spades"};
+    static final String[] Rank = {"", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
+
+    /* Data field of a card: rank and suit */
+    private int cardRank;  /* values: 1-13 (see Rank[] above) */
+
+    private int cardSuit;  /* values: 0-4  (see Suit[] above) */
+
+    /* Constructor to create a card */
+    /* throw PlayingCardException if rank or suit is invalid */
+
+    public Card(int suit, int rank) throws PlayingCardException {
+
+        // suit =0 is joker, rank must be 1 or 2
+        if (suit == 0) {
+            if ((rank < 1) || (rank > 2)) {
+                throw new PlayingCardException("Invalid rank for Joker:" + rank);
+            }
+            cardRank = rank;
+            cardSuit = 0;
+        } else {
+
+            if ((rank < 1) || (rank > 13)) {
+                throw new PlayingCardException("Invalid rank:" + rank);
+            } else {
+                cardRank = rank;
+            }
+
+            if ((suit < 1) || (suit > 4)) {
+                throw new PlayingCardException("Invalid suit:" + suit);
+            } else {
+                cardSuit = suit;
+            }
+        }
+    }
+
+    /* Accessor and toString */
+    /* You may impelemnt equals(), but it will not be used */
+    public int getRank() {
+        return cardRank;
+    }
+
+    public int getSuit() {
+        return cardSuit;
+    }
+
+    public String toString() {
+        if (cardSuit == 0) {
+            return Suit[cardSuit] + " #" + cardRank;
+        } else {
+            return Rank[cardRank] + " " + Suit[cardSuit];
+        }
+    }
+
+    /* Few quick tests here */
+    public static void main(String args[]) {
+        try {
+            Card c1 = new Card(4, 1);    // A Spades
+            System.out.println(c1);
+            c1 = new Card(1, 10);	// 10 Clubs
+            System.out.println(c1);
+            c1 = new Card(0, 2);		// Joker #2
+            System.out.println(c1);
+            c1 = new Card(5, 10);        // generate exception here
+        } catch (PlayingCardException e) {
+            System.out.println("PlayingCardException: " + e.getMessage());
+        }
+    }
+}
+
+//=================================================================================
+/**
+ * class Decks represents : n decks of 52 (or 54) playing cards Use class Card
+ * to construct n * 52 (or 54) playing cards!
+ *
+ * Do not add new data fields! Do not modify any methods You may add private
+ * methods
+ */
+class Decks {
+    /* this is used to keep track of original n*52 or n*54 cards */
+
+    private List<Card> originalDecks;
+
+    /* this starts with copying cards from originalDecks */
+    /* it is used to play the card game                  */
+    /* see reset(): resets gameDecks to originalDecks    */
+    private List<Card> gameDecks;
+
+    /* number of decks in this object */
+    private int numberDecks;
+    private boolean withJokers;
+
+    /**
+     * Constructor: Creates one deck of 52 or 54 (withJokers = false or true)
+     * playing cards in originalDecks and copy them to gameDecks. initialize
+     * numberDecks=1 Note: You need to catch PlayingCardException from Card
+     * constructor Use ArrayList for both originalDecks & gameDecks
+     */
+    public Decks(boolean withJokers) {
+        //intialize numberDecks
+        numberDecks = 1;
+        try{
+            //create deck with jokers
+        if(this.withJokers == true){
+            originalDecks = new ArrayList<>(54); 
+            //add suit and rank of jokers
+            originalDecks.add(new Card(0,1));
+            originalDecks.add(new Card(0,2));
+            //add suit and rank of regular cards
+            for(int i = 1; i < 5; i++){
+                for(int j = 1; j <= 13; j++){
+                    originalDecks.add(new Card(i,j));
+                }
+            }
+        }else{
+            //add deck without jokers
+            originalDecks = new ArrayList<>(52);
+            for(int i = 1; i < 5; i++){
+            for(int j = 1; j <= 13; j++){
+                originalDecks.add(new Card(i,j));
+            }
+        }
+        }
+       }catch(PlayingCardException e){
+           System.out.println(e);
+       }
+        gameDecks = new ArrayList<>(originalDecks);
+    }
+    /**
+     * Constructor: Creates n decks (54 or 52 cards each deck - with or without
+     * Jokers) of playing cards in originalDecks and copy them to gameDecks.
+     * initialize numberDecks=n Note: You need to catch PlayingCardException
+     * from Card constructor Use ArrayList for both originalDecks & gameDecks
+     */
+    public Decks(int n, boolean withJokers) {
+        //initialize numberDecks
+        numberDecks = n;
+        this.withJokers = withJokers;
+        //create deck(s) with jokers
+        try {
+            if (this.withJokers == true) {
+                originalDecks = new ArrayList<>(54 * numberDecks);
+                for (int i = 0; i < numberDecks; i++) {
+                    originalDecks.add(new Card(0, 1));
+                    originalDecks.add(new Card(0, 2));
+                    //add suit and rank of regular cards
+                    for (int j = 1; j < 5; j++) {
+                        for (int k = 1; k <= 13; k++) {
+                            originalDecks.add(new Card(j, k));
+                        }
+                    }
+                }
+                //add deck without jokers
+            } else {
+                originalDecks = new ArrayList(52 * numberDecks);
+                for (int i = 1; i < 5; i++) {
+                    for (int j = 1; j <= 13; j++) {
+                        originalDecks.add(new Card(i, j));
+                    }
+                }
+            }
+        }
+        catch (PlayingCardException e) {
+            System.out.println(e);
+        }
+        //copy originalDecks to gameDecks
+        gameDecks = new ArrayList<>(originalDecks);
+    }
+
+    /**
+     * Task: Shuffles cards in gameDecks. Hint: Look at java.util.Collections
+     */
+    public void shuffle() {
+        // implement this method!
+        Collections.shuffle(gameDecks);
+    }
+
+    /**
+     * Task: Deals cards from the gameDecks.
+     *
+     * @param numberCards number of cards to deal
+     * @return a list containing cards that were dealt
+     * @throw PlayingCardException if numberCard > number of remaining cards
+     *
+     * Note: You need to create ArrayList to stored dealt cards and should
+     * removed dealt cards from gameDecks
+     *
+     */
+    public List<Card> deal(int numberCards) throws PlayingCardException {
+        // implement this method!
+        //create array list for cards dealt
+        List<Card> cardsDealt = new ArrayList<>();
+        //add cards to gameDecks
+        try {
+            for (int i = 0; i <= numberCards; i++) {
+                //condition if no cards in gameDecks
+                if (gameDecks.isEmpty()) {
+                    throw new PlayingCardException("No cards in deck!");
+                } else {
+                    cardsDealt.add(gameDecks.remove(gameDecks.size() - 1));
+                }
+            }
+        } catch (PlayingCardException e) {
+            System.out.println(e);
+        }
+        return cardsDealt;
+    }
+
+    /**
+     * Task: Resets gameDecks by getting all cards from the originalDecks.
+     */
+    public void reset() {
+        // implement this method!
+        gameDecks.clear();
+        gameDecks.addAll(originalDecks);
+    }
+
+    /**
+     * Task: Return number of decks.
+     */
+    public int getNumberDecks() {
+        return numberDecks;
+    }
+
+    /**
+     * Task: Return withJokers.
+     */
+    public boolean getWithJokers() {
+        return withJokers;
+    }
+
+    /**
+     * Task: Return number of remaining cards in gameDecks.
+     */
+    public int remainSize() {
+        return gameDecks.size();
+    }
+
+    /**
+     * Task: Returns a string representing cards in the gameDecks
+     */
+    public String toString() {
+        return "" + gameDecks;
+    }
+
+
+    /* Quick test                    */
+    /*                               */
+    /* Do not modify these tests     */
+    /* Generate 2 decks of 54 cards  */
+    /* Loop 2 times:                 */
+    /*   Deal 27 cards for 5 times   */
+    /*   Expect exception at 5th time*/
+    /*   reset()                     */
+    public static void main(String args[]) {
+
+        System.out.println("*******    Create 2 decks of cards      ********\n");
+        Decks decks = new Decks(2, true);
+        System.out.println("getNumberDecks:" + decks.getNumberDecks());
+        System.out.println("getWithJokers:" + decks.getWithJokers());
+
+        for (int j = 0; j < 2; j++) {
+            System.out.println("\n************************************************\n");
+            System.out.println("Loop # " + j + "\n");
+            System.out.println("Before shuffle:" + decks.remainSize() + " cards");
+            System.out.println("\n\t" + decks);
+            System.out.println("\n==============================================\n");
+
+            int numHands = 5;
+            int cardsPerHand = 27;
+
+            for (int i = 0; i < numHands; i++) {
+                decks.shuffle();
+                System.out.println("After shuffle:" + decks.remainSize() + " cards");
+                System.out.println("\n\t" + decks);
+                try {
+                    System.out.println("\n\nHand " + i + ":" + cardsPerHand + " cards");
+                    System.out.println("\n\t" + decks.deal(cardsPerHand));
+                    System.out.println("\n\nRemain:" + decks.remainSize() + " cards");
+                    System.out.println("\n\t" + decks);
+                    System.out.println("\n==============================================\n");
+                } catch (PlayingCardException e) {
+                    System.out.println("*** In catch block:PlayingCardException:Error Msg: " + e.getMessage());
+                }
+            }
+
+            decks.reset();
+        }
+    }
+
+}
